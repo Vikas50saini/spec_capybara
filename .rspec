@@ -1,0 +1,2 @@
+-- format documentation  # Output test results in a more readable format
+-- require spec_helper   # Include a custom spec helper file if needed
