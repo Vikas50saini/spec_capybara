@@ -31,7 +31,7 @@ end
 
 RSpec.describe 'saucedemo', type: :feature do
   include Capybara::DSL
-  user_data = YAML.load_file("/Users/vikas/Documents/spec_capybara_tests/fixtures/userData.yml")
+  user_data = YAML.load_file("./fixtures/userData.yml")
 
   user_data.each do |user, data|
     username = data['username']
