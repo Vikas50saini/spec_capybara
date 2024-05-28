@@ -1,0 +1,30 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  run-tests:
+    runs-on: ubuntu-latest  # Replace with desired runner (e.g., macos-latest, windows-latest)
+    steps:
+      - uses: actions/checkout@v4
+      - name: Use Ruby version
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.1.2  # Match your Ruby version
+
+      - name: Install dependencies
+        run: bundle install
+
+      - name: Run headless tests with parallel execution
+        run: HEADLESS_MODE=true bundle exec parallel_rspec spec/* -n 4
+
+      - name: Generate HTML report (optional)  
+        # Assuming `merge_reports.rb` script is present in the repository
+        run: ruby merge_reports.rb  # Script to combine reports (if needed)
+
+      - uses: actions/upload-artifact@v3  # Upload report as artifact
+        with:
+          name: test-report
+          path: merged_report.html  # Replace with actual report path if different
