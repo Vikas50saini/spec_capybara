@@ -8,19 +8,13 @@ pipeline {
             }
         }
 
-        stage('Setup') {
-            environment {
-                RUBY_VERSION = '3.1.2'
-                HEADLESS_MODE = 'true'
+        agent { docker { image 'ruby:3.1.2' } }
+           stages {
+            stage('requirements') {
+              steps {
+                sh 'gem install bundler -v 2.0.1'
+               }
             }
-            steps {
-                script {
-                    // Use Ruby version
-                    sh "rvm install ${RUBY_VERSION}"
-                    sh "rvm use ${RUBY_VERSION} --default"
-                }
-            }
-        }
 
         stage('Install Dependencies') {
             steps {
