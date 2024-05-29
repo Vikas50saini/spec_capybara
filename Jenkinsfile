@@ -1,8 +1,6 @@
 pipeline {
     agent {
         docker {
-            cloud 'Docker' // Specify the cloud configuration name
-            label 'docker' // Optional: Specify a label if needed
             image 'ruby:3.1.2' // Use your custom Docker image with RVM installed
             args '-u root' // This is optional, to run Docker container as root
         }
