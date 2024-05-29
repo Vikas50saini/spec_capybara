@@ -1,0 +1,22 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo "Setting up environment"
+      - ruby -v
+      - gem install bundler -v 2.3.4
+      - bundle install
+  build:
+    commands:
+      - echo "Running tests"
+      - HEADLESS_MODE=true bundle exec parallel_rspec spec/* -n 4
+
+artifacts:
+  files:
+    - spec/reports/*.html
+    - spec/reports/*.xml
+
+cache:
+  paths:
+    - /root/.bundle/cache

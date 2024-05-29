@@ -70,7 +70,7 @@ GEM
       rouge (~> 1.6)
       rspec
     rubyzip (2.3.2)
-    selenium-webdriver (4.10.0)
+    selenium-webdriver (4.13.1)
       rexml (~> 3.2, >= 3.2.5)
       rubyzip (>= 1.2.2, < 3.0)
       websocket (~> 1.0)
@@ -98,7 +98,7 @@ DEPENDENCIES
   rspec
   rspec-retry (~> 0.6.2)
   rspec_html_reporter
-  selenium-webdriver (~> 4.10.0)
+  selenium-webdriver (~> 4.13.0)
   simplecov
   yaml (~> 0.3.0)
 

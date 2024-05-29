@@ -3,3 +3,4 @@
 --format html
 --out rspec_results.html
 --retry 3
+-rdebugger
