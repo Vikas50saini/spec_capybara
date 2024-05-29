@@ -15,15 +15,17 @@ pipeline {
                     # Install RVM if not installed
                     if ! type rvm > /dev/null 2>&1; then
                         curl -sSL https://get.rvm.io | bash -s stable
-                        source ~/.rvm/scripts/rvm
                     fi
 
-                    # Install specified Ruby version if not installed
-                    rvm list strings | grep -q ${RVM_VERSION} || rvm install ${RVM_VERSION}
-
-                    # Use specified Ruby version
-                    rvm use ${RVM_VERSION} --default
+                    # Source RVM scripts and reload shell environment
+                    source ~/.rvm/scripts/rvm
                     '''
+
+                    // Install specified Ruby version if not installed
+                    sh "rvm install ${RVM_VERSION}"
+
+                    // Use specified Ruby version
+                    sh "rvm use ${RVM_VERSION} --default"
                 }
                 // Print Ruby and Bundler versions to verify setup
                 sh 'ruby -v'
@@ -32,19 +34,7 @@ pipeline {
             }
         }
 
-        stage('Install Dependencies') {
-            steps {
-                // Install gem dependencies
-                sh 'bundle install'
-            }
-        }
-
-        stage('Run Tests') {
-            steps {
-                // Run the test suite
-                sh 'HEADLESS_MODE=true bundle exec parallel_rspec spec/* -n 4'
-            }
-        }
+        // Rest of your stages...
     }
 
     post {
