@@ -1,47 +1,53 @@
 pipeline {
     agent any
 
-    environment {
-        RVM_VERSION = '3.1.2'
-        HEADLESS_MODE = 'true'
-    }
-
     stages {
-        stage('Setup') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Install RVM and the specified Ruby version
-                    sh '''
-                    # Install RVM if not installed
-                    if ! type rvm > /dev/null 2>&1; then
-                        curl -sSL https://get.rvm.io | bash -s stable
-                    fi
-
-                    # Source RVM scripts and reload shell environment
-                    source ~/.rvm/scripts/rvm
-                    '''
-
-                    // Install specified Ruby version if not installed
-                    sh "rvm install ${RVM_VERSION}"
-
-                    // Use specified Ruby version
-                    sh "rvm use ${RVM_VERSION} --default"
-                }
-                // Print Ruby and Bundler versions to verify setup
-                sh 'ruby -v'
-                sh 'gem install bundler -v 2.3.4'
-                sh 'bundle -v'
+                checkout scm
             }
         }
 
-        // Rest of your stages...
+        stage('Setup') {
+            environment {
+                RUBY_VERSION = '3.1.2'
+                HEADLESS_MODE = 'true'
+            }
+            steps {
+                script {
+                    // Use Ruby version
+                    sh "rvm install ${RUBY_VERSION}"
+                    sh "rvm use ${RUBY_VERSION} --default"
+                }
+            }
+        }
+
+        stage('Install Dependencies') {
+            steps {
+                // Install gem dependencies
+                sh 'bundle install'
+            }
+        }
+
+        stage('Run Tests') {
+            steps {
+                // Run headless tests with parallel execution
+                sh 'HEADLESS_MODE=true bundle exec parallel_rspec spec/* -n 4'
+            }
+        }
+
+        stage('Generate HTML report') {
+            steps {
+                // Assuming `merge_reports.rb` script is present in the repository
+                sh 'ruby merge_reports.rb' // Script to combine reports (if needed)
+            }
+        }
     }
 
     post {
         always {
             // Archive test results and any other reports you need
-            archiveArtifacts artifacts: '**/spec/reports/*.html', allowEmptyArchive: true
-            junit '**/spec/reports/*.xml'
+            archiveArtifacts artifacts: '**/merged_report.html', allowEmptyArchive: true
         }
         cleanup {
             // Clean up the workspace
