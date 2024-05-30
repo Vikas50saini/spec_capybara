@@ -1,5 +1,10 @@
 pipeline {
-    agent any
+    agent {
+        docker {
+            image 'ruby:3.1.2' // Use your custom Docker image with RVM installed
+            args '-u root' // This is optional, to run Docker container as root
+        }
+    }
 
     environment {
         RVM_VERSION = '3.1.2'
@@ -10,14 +15,8 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    // Install RVM and the specified Ruby version
+                    // Install the specified Ruby version
                     sh '''
-                    # Install RVM if not installed
-                    if ! type rvm > /dev/null 2>&1; then
-                        curl -sSL https://get.rvm.io | bash -s stable
-                        source ~/.rvm/scripts/rvm
-                    fi
-
                     # Install specified Ruby version if not installed
                     rvm list strings | grep -q ${RVM_VERSION} || rvm install ${RVM_VERSION}
 
