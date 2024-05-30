@@ -1,60 +1,55 @@
 pipeline {
     agent {
         docker {
-            image 'ruby:3.1.2' // Use your custom Docker image with RVM installed
-            args '-u root' // This is optional, to run Docker container as root
+            label 'docker-agent' // The label configured in the Docker template
+            image 'ruby:3.1.2' // The Docker image to use
+            args '-v /host/path/to/project:/project' // Optional: bind mount if needed
         }
     }
 
     environment {
-        RVM_VERSION = '3.1.2'
-        HEADLESS_MODE = 'true'
+        HEADLESS_MODE = 'true' // Environment variable for headless mode
     }
 
     stages {
-        stage('Setup') {
+        stage('Checkout') {
             steps {
-                script {
-                    // Install the specified Ruby version
-                    sh '''
-                    # Install specified Ruby version if not installed
-                    rvm list strings | grep -q ${RVM_VERSION} || rvm install ${RVM_VERSION}
-
-                    # Use specified Ruby version
-                    rvm use ${RVM_VERSION} --default
-                    '''
-                }
-                // Print Ruby and Bundler versions to verify setup
-                sh 'ruby -v'
-                sh 'gem install bundler -v 2.3.4'
-                sh 'bundle -v'
+                // Checkout your code from your GitHub repository
+                git url: 'https://github.com/your-username/your-repo.git', branch: 'main'
             }
         }
 
         stage('Install Dependencies') {
             steps {
-                // Install gem dependencies
+                // Install bundler and the project dependencies
+                sh 'gem install bundler -v 2.3.4'
                 sh 'bundle install'
             }
         }
 
         stage('Run Tests') {
             steps {
-                // Run the test suite
-                sh 'HEADLESS_MODE=true bundle exec parallel_rspec spec/* -n 4'
+                // Execute the parallel RSpec tests
+                sh 'bundle exec parallel_rspec spec/* -n 4'
             }
         }
     }
 
     post {
         always {
-            // Archive test results and any other reports you need
-            archiveArtifacts artifacts: '**/spec/reports/*.html', allowEmptyArchive: true
-            junit '**/spec/reports/*.xml'
+            // Archive test results and other artifacts if necessary
+            archiveArtifacts artifacts: '**/log/*.log', allowEmptyArchive: true
+            junit '**/reports/**/*.xml'
         }
-        cleanup {
-            // Clean up the workspace
-            cleanWs()
+
+        success {
+            // Notify success (e.g., via email or Slack)
+            echo 'Tests passed successfully!'
+        }
+
+        failure {
+            // Notify failure (e.g., via email or Slack)
+            echo 'Tests failed.'
         }
     }
 }
