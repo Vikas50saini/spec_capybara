@@ -35,3 +35,6 @@ COPY . .
 
 # Set the command to run tests
 CMD ["bundle", "exec", "parallel_rspec", "spec", "-n", "4"]
+
+# build image: docker build -t spec_capybara_tests .
+# run container: docker run --rm spec_capybara_tests
