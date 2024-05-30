@@ -1,7 +1,7 @@
 pipeline {
     agent {
         docker {
-            label 'Docker' // The label configured in the Docker template
+            label 'docker-agent' // The label configured in the Docker template
             image 'ruby:3.1.2' // The Docker image to use
             args '-v /host/path/to/project:/project' // Optional: bind mount if needed
         }
