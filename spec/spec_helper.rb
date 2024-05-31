@@ -11,6 +11,10 @@ headless_mode = ENV['HEADLESS_MODE'] == 'true'
 Capybara.register_driver :chrome do |app|
   options = Selenium::WebDriver::Chrome::Options.new
   options.add_argument('--no-sandbox') # Optional: Address potential sandbox issues
+  options.add_argument('--enable-features=NetworkService,NetworkServiceInProcess')
+  options.add_argument('--disk-cache-dir=/tmp/cache-dir')  # Set a custom cache directory
+  options.add_argument('--disk-cache-size=104857600')  # Set cache size (in bytes, e.g., 100MB)
+  options.add_argument('--enable-application-cache')
   if headless_mode
     options.add_argument('--headless')
   end
